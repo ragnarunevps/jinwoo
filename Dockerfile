@@ -10,7 +10,7 @@ RUN apt-get update && \
     apt-get clean
 
 # Download and install Upterm prebuilt binary
-RUN wget https://github.com/owenthereal/upterm/releases/download/v0.6.5/upterm-linux_amd64.tar.gz -O upterm.tar.gz && \
+RUN wget https://github.com/owenthereal/upterm/releases/download/v0.14.3/upterm_linux_amd64.tar.gz -O upterm.tar.gz && \
     mkdir -p upterm && \
     tar -xzf upterm.tar.gz -C upterm && \
     mv upterm/upterm /usr/local/bin/ && \
