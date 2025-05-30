@@ -1,16 +1,22 @@
 #!/bin/bash
 
-# Fail on error
 set -e
 
-# Setup known_hosts to skip "authenticity" prompt
+# Setup ~/.ssh directory
 mkdir -p ~/.ssh
+
+# Add uptermd fingerprint to known_hosts so no prompt happens
 ssh-keyscan -t ed25519 uptermd.upterm.dev >> ~/.ssh/known_hosts
 
-# Generate SSH key if not present
+# Generate SSH key if not already present
 if [ ! -f ~/.ssh/id_rsa ]; then
   ssh-keygen -t rsa -b 3072 -f ~/.ssh/id_rsa -N ""
 fi
 
-# Start the upterm host session
-upterm host --accept -- bash
+# Show public key (for debugging or manual SSH auth if needed)
+echo "==== Public Key ===="
+cat ~/.ssh/id_rsa.pub
+echo "===================="
+
+# Host the upterm session with auto accept
+upterm host --accept --server ssh://uptermd.upterm.dev:22 -- bash
