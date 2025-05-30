@@ -2,22 +2,21 @@ FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install dependencies
+# Install required dependencies
 RUN apt-get update && \
-    apt-get install -y wget curl git openssh-client golang tzdata && \
+    apt-get install -y wget curl openssh-client tzdata && \
     ln -sf /usr/share/zoneinfo/Asia/Kolkata /etc/localtime && \
     dpkg-reconfigure -f noninteractive tzdata && \
     apt-get clean
 
-# Set Go env path (default Go install path)
-ENV PATH="/root/go/bin:$PATH"
+# Download and install Upterm prebuilt binary
+RUN wget https://github.com/owenthereal/upterm/releases/download/v0.6.5/upterm-linux_amd64.tar.gz -O upterm.tar.gz && \
+    mkdir -p upterm && \
+    tar -xzf upterm.tar.gz -C upterm && \
+    mv upterm/upterm /usr/local/bin/ && \
+    chmod +x /usr/local/bin/upterm
 
-# Build Upterm from source
-RUN git clone https://github.com/owenthereal/upterm.git && \
-    cd upterm && \
-    go install ./cmd/upterm/...
-
-# Copy and make startup script executable
+# Copy startup script
 COPY start.sh /start.sh
 RUN chmod +x /start.sh
 
