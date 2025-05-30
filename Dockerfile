@@ -9,17 +9,13 @@ RUN apt-get update && apt-get install -y \
     ca-certificates \
     && apt-get clean
 
-# Install Upterm (latest release)
-RUN curl -s https://api.github.com/repos/owenthereal/upterm/releases/latest \
-  | grep "browser_download_url.*linux_amd64.deb" \
-  | cut -d '"' -f 4 \
-  | xargs curl -L -o upterm.deb && \
-  dpkg -i upterm.deb && \
-  rm upterm.deb
+# Install Upterm manually from fixed working .deb
+RUN curl -L -o upterm.deb https://github.com/owenthereal/upterm/releases/download/v0.10.0/upterm_0.10.0_linux_amd64.deb && \
+    dpkg -i upterm.deb && \
+    rm upterm.deb
 
 # Add script
 COPY start.sh /start.sh
 RUN chmod +x /start.sh
 
-# Start session
 CMD ["/start.sh"]
