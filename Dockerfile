@@ -5,7 +5,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Install dependencies and set timezone
 RUN apt-get update && \
     apt-get install -y tmate tzdata expect && \
-    ln -sf /usr/share/zoneinfo/Asia/Kathmandu /etc/localtime && \
+    ln -sf /usr/share/zoneinfo/Asia/Kolkata /etc/localtime && \
     dpkg-reconfigure -f noninteractive tzdata && \
     apt-get clean
 
