@@ -1,26 +1,19 @@
 #!/bin/bash
 
-export DEBIAN_FRONTEND=noninteractive
+# Install upterm (if not already included in Docker image)
+curl -s https://api.github.com/repos/owenthereal/upterm/releases/latest \
+| grep "browser_download_url.*linux_amd64\.tar\.gz" \
+| cut -d '"' -f 4 \
+| wget -qi - -O upterm.tar.gz
 
-# Set timezone
-ln -sf /usr/share/zoneinfo/Asia/Kathmandu /etc/localtime
-dpkg-reconfigure -f noninteractive tzdata
+mkdir -p upterm
+tar -xzf upterm.tar.gz -C upterm
+mv upterm/upterm /usr/local/bin/
 
-# Start tmate session
-tmate -S /tmp/tmate.sock new-session -d
-tmate -S /tmp/tmate.sock wait tmate-ready
+# Generate SSH keys if not exists
+if [ ! -f ~/.ssh/id_rsa ]; then
+    ssh-keygen -t rsa -f ~/.ssh/id_rsa -N ""
+fi
 
-# Print SSH and Web URLs
-echo "===================="
-echo "💻 SSH access:"
-tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}'
-
-echo "🌐 Web access (read-write):"
-tmate -S /tmp/tmate.sock display -p '#{tmate_web}'
-echo "===================="
-
-# Start a fake HTTP server to make Render think we're hosting a web app
-nohup python3 -m http.server 10000 --bind 0.0.0.0 >/dev/null 2>&1 &
-
-# Keep container running forever
-tail -f /dev/null
+# Start Upterm session
+upterm host --force-command "bash" --server ssh://uptermd.upterm.dev
