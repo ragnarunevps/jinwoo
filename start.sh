@@ -1,19 +1,10 @@
 #!/bin/bash
 
-# Generate SSH key if missing
+# Generate SSH keys if not exists
 if [ ! -f ~/.ssh/id_rsa ]; then
-    mkdir -p ~/.ssh
-    ssh-keygen -t rsa -f ~/.ssh/id_rsa -N ""
+  mkdir -p ~/.ssh
+  ssh-keygen -t rsa -b 3072 -f ~/.ssh/id_rsa -N ""
 fi
 
-echo "📡 Launching Upterm session..."
-upterm host --force-command "bash" --server ssh://uptermd.upterm.dev &
-
-# Wait and print connection string
-sleep 5
-upterm session current
-
-# Keep container running
-while true; do
-  sleep 10
-done
+# Start Upterm with correct flags
+upterm host --server ssh://uptermd.upterm.dev:22 --accept --force-command 'tmux attach -t pair-programming || tmux new -s pair-programming'
