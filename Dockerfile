@@ -1,23 +1,25 @@
-FROM ubuntu:22.04
+FROM debian:bullseye-slim
 
-ENV DEBIAN_FRONTEND=noninteractive
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+  curl \
+  openssh-client \
+  tmux \
+  git \
+  ca-certificates \
+  && apt-get clean
 
-# Install required dependencies
-RUN apt-get update && \
-    apt-get install -y wget curl openssh-client tzdata && \
-    ln -sf /usr/share/zoneinfo/Asia/Kolkata /etc/localtime && \
-    dpkg-reconfigure -f noninteractive tzdata && \
-    apt-get clean
+# Install upterm
+RUN curl -s https://api.github.com/repos/owenthereal/upterm/releases/latest \
+  | grep "browser_download_url.*linux_amd64\.deb" \
+  | cut -d '"' -f 4 \
+  | xargs curl -L -o upterm.deb \
+  && dpkg -i upterm.deb \
+  && rm upterm.deb
 
-# Download and install Upterm prebuilt binary
-RUN wget https://github.com/owenthereal/upterm/releases/download/v0.14.3/upterm_linux_amd64.tar.gz -O upterm.tar.gz && \
-    mkdir -p upterm && \
-    tar -xzf upterm.tar.gz -C upterm && \
-    mv upterm/upterm /usr/local/bin/ && \
-    chmod +x /usr/local/bin/upterm
-
-# Copy startup script
+# Copy start script
 COPY start.sh /start.sh
 RUN chmod +x /start.sh
 
+# Default command
 CMD ["/start.sh"]
