@@ -1,21 +1,17 @@
-FROM debian:bullseye-slim
+FROM ubuntu:22.04
 
-# Install dependencies
-RUN apt-get update && apt-get install -y \
-    curl \
-    openssh-client \
-    git \
-    tmux \
-    ca-certificates \
-    && apt-get clean
+ENV DEBIAN_FRONTEND=noninteractive
 
-# Install Upterm manually from fixed working .deb
-RUN curl -L -o upterm.deb https://github.com/owenthereal/upterm/releases/download/v0.10.0/upterm_0.10.0_linux_amd64.deb && \
-    dpkg -i upterm.deb && \
-    rm upterm.deb
+# Install dependencies and set timezone
+RUN apt-get update && \
+    apt-get install -y tmate tzdata expect && \
+    ln -sf /usr/share/zoneinfo/Asia/Kathmandu /etc/localtime && \
+    dpkg-reconfigure -f noninteractive tzdata && \
+    apt-get clean
 
-# Add script
+# Copy startup script
 COPY start.sh /start.sh
 RUN chmod +x /start.sh
 
+# Run script on container start
 CMD ["/start.sh"]
